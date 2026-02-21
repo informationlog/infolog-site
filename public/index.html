@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Information Logistics — AI Product Design Studio</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<script>
+tailwind.config = {
+  darkMode: 'class',
+  theme: {
+    extend: {
+      fontFamily: {
+        display: ['Instrument Serif', 'EB Garamond', 'serif'],
+        garamond: ['EB Garamond', 'Garamond', 'serif'],
+        mono: ['JetBrains Mono', 'SF Mono', 'monospace'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+      },
+    }
+  }
+}
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+  /* ── LIGHT (default) ── */
+  :root {
+    --surface: #f6f4f0;
+    --card: #eae7e1;
+    --card-hover: #e1ddd5;
+    --card-border: rgba(60,50,30,0.06);
+    --text-1: #1a1814;
+    --text-2: rgba(26,24,20,0.56);
+    --text-3: rgba(26,24,20,0.22);
+    --glass-bg: rgba(246,244,240,0.78);
+    --glass-border: rgba(60,50,30,0.07);
+    --accent: #4a7a52;
+    --accent-soft: rgba(74,122,82,0.10);
+    --accent-green: #4a7a52;
+    --accent-green-soft: rgba(74,122,82,0.08);
+    --grain-opacity: 0.028;
+    --ornament: rgba(60,50,30,0.10);
+    --dither-1: rgba(74,122,82,0.05);
+    --dither-2: rgba(74,122,82,0.04);
+    --dither-3: rgba(100,80,140,0.03);
+  }
+
+  /* ── DARK ── */
+  .dark {
+    --surface: #0e0c09;
+    --card: #1c1915;
+    --card-hover: #252118;
+    --card-border: rgba(255,235,200,0.06);
+    --text-1: #f5f0e8;
+    --text-2: rgba(245,240,232,0.52);
+    --text-3: rgba(245,240,232,0.22);
+    --glass-bg: rgba(14,12,9,0.78);
+    --glass-border: rgba(255,235,200,0.08);
+    --accent: #8cc98a;
+    --accent-soft: rgba(140,201,138,0.10);
+    --accent-green: #8cc98a;
+    --accent-green-soft: rgba(140,201,138,0.06);
+    --grain-opacity: 0.022;
+    --ornament: rgba(255,235,200,0.06);
+    --dither-1: rgba(140,201,138,0.06);
+    --dither-2: rgba(140,201,138,0.04);
+    --dither-3: rgba(140,120,200,0.03);
+  }
+
+  body { background: var(--surface); color: var(--text-1); transition: background 0.5s, color 0.5s; }
+
+  /* ── Film grain ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  /* ── Dithered radial gradients ── */
+  .dither-blob {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    filter: url(#dither-filter);
+  }
+
+  /* ── Ornament ── */
+  .ornament { display: flex; align-items: center; gap: 14px; justify-content: center; }
+  .ornament::before, .ornament::after { content: ''; flex: 1; max-width: 100px; height: 1px; background: var(--ornament); }
+  .ornament-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); opacity: 0.5; }
+
+  /* ── Nav ── */
+  nav { background: var(--glass-bg); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid var(--glass-border); transition: background 0.5s; }
+  .nav-link { color: var(--text-2); text-decoration: none; transition: color 0.25s; position: relative; }
+  .nav-link:hover { color: var(--text-1); }
+  .nav-link::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 0; height: 1px; background: var(--accent); transition: width 0.3s; }
+  .nav-link:hover::after { width: 100%; }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    transition: background 0.4s, transform 0.5s cubic-bezier(0.23,1,0.32,1), box-shadow 0.5s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover {
+    background: var(--card-hover);
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px -16px var(--accent-soft);
+  }
+
+  /* ── Glass panel ── */
+  .glass-panel { background: var(--card); border: 1px solid var(--card-border); border-radius: 24px; position: relative; overflow: hidden; transition: background 0.5s, border-color 0.5s; }
+  .glass-panel::after { content:''; position: absolute; top:0; left:15%; right:15%; height:1px; background: linear-gradient(90deg, transparent, var(--card-border), transparent); }
+
+  /* ── Terminal ── */
+  .terminal { border-radius: 12px; font-family: 'JetBrains Mono', 'SF Mono', monospace; }
+  .dark .terminal { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,235,200,0.06); }
+  html:not(.dark) .terminal { background: rgba(40,30,10,0.03); border: 1px solid rgba(40,30,10,0.06); }
+  .dark .t-prompt { color: #8cc98a; } .dark .t-flag { color: #8cc98a; } .dark .t-value { color: rgba(245,240,232,0.45); } .dark .t-comment { color: rgba(245,240,232,0.18); }
+  html:not(.dark) .t-prompt { color: #4a7a52; } html:not(.dark) .t-flag { color: #4a7a52; } html:not(.dark) .t-value { color: rgba(26,24,20,0.42); } html:not(.dark) .t-comment { color: rgba(26,24,20,0.20); }
+
+  /* ── Buttons ── */
+  .btn-p { background: var(--accent); color: #fff; transition: all 0.4s cubic-bezier(0.23,1,0.32,1); }
+  .dark .btn-p { color: #0e0c09; }
+  .btn-p:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 8px 24px -6px var(--accent-soft); }
+  .btn-g { border: 1px solid var(--glass-border); color: var(--text-1); transition: all 0.4s cubic-bezier(0.23,1,0.32,1); }
+  .btn-g:hover { border-color: var(--text-3); transform: translateY(-2px); }
+
+  /* ── Tags ── */
+  .tag { border: 1px solid var(--card-border); color: var(--text-2); transition: all 0.3s; }
+  .tag:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Spec rows ── */
+  .spec-row { border-bottom: 1px solid var(--card-border); transition: background 0.3s; }
+  .spec-row:first-of-type { border-top: 1px solid var(--card-border); }
+  .spec-row:hover { background: var(--accent-soft); }
+
+  .div-line { border-color: var(--card-border); }
+
+  /* ── Theme toggle ── */
+  .theme-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--glass-border); background: transparent; color: var(--text-2); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; }
+  .theme-btn:hover { color: var(--text-1); border-color: var(--text-3); transform: rotate(15deg); }
+  .theme-btn svg { width: 16px; height: 16px; }
+  .dark .icon-sun { display: block; } .dark .icon-moon { display: none; }
+  html:not(.dark) .icon-sun { display: none; } html:not(.dark) .icon-moon { display: block; }
+
+  /* ── Gradient text ── */
+  .dark .grad { background: linear-gradient(135deg, #8cc98a, #5ab8a0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  html:not(.dark) .grad { background: linear-gradient(135deg, #4a7a52, #3a7a6e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+  .m-accent { color: var(--accent); }
+  .m-green { color: var(--accent-green); }
+
+  /* ── Quote mark ── */
+  .quote-mark { font-family: 'Instrument Serif', serif; font-size: 7rem; line-height: 1; color: var(--accent); opacity: 0.10; position: absolute; user-select: none; }
+
+  /* ── Hand-drawn illustration placeholder ── */
+  .sketch-area {
+    border: 1px dashed var(--card-border);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-3);
+    font-style: italic;
+    min-height: 200px;
+  }
+
+  /* ── Animations ── */
+  @keyframes up { from { opacity:0; transform: translateY(22px); } to { opacity:1; transform: translateY(0); } }
+  .ha { opacity: 0; animation: up 0.9s cubic-bezier(0.16,1,0.3,1) forwards; }
+  .ha1 { animation-delay: 0.1s; } .ha2 { animation-delay: 0.35s; } .ha3 { animation-delay: 0.6s; } .ha4 { animation-delay: 0.85s; }
+  .rv { opacity: 0; transform: translateY(24px); transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+  .rv.vis { opacity: 1; transform: translateY(0); }
+  .d1 { transition-delay: 0.1s; } .d2 { transition-delay: 0.2s; } .d3 { transition-delay: 0.3s; }
+
+  /* ── Marquee ── */
+  .marquee-track { display: flex; width: max-content; animation: marquee 24s linear infinite; }
+  @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  .marquee-track:hover { animation-play-state: paused; }
+
+  /* ── Parallax ── */
+  .parallax-slow { will-change: transform; }
+
+  @media (max-width: 768px) {
+    .bento { grid-template-columns: 1fr !important; }
+    .bento > * { grid-column: span 1 !important; }
+    .marquee-track { animation-duration: 14s; }
+  }
+</style>
+</head>
+<body class="font-sans overflow-x-hidden">
+
+<!-- SVG dither filter -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <filter id="dither-filter" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="3" result="noise" />
+      <feColorMatrix type="saturate" values="0" in="noise" result="mono" />
+      <feComponentTransfer in="mono" result="threshold">
+        <feFuncA type="discrete" tableValues="0 0 0 0.3 0.5 0.7 1 1" />
+      </feComponentTransfer>
+      <feComposite in="SourceGraphic" in2="threshold" operator="in" />
+    </filter>
+  </defs>
+</svg>
+
+<!-- NAV -->
+<nav class="fixed top-0 w-full z-50">
+  <div class="max-w-[1120px] mx-auto px-6 h-[48px] flex items-center justify-between">
+    <span class="font-sans text-[13px] font-semibold tracking-tight" style="color: var(--text-1);">information logistics</span>
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#work" class="nav-link font-sans text-[12px] tracking-[0.06em]">Work</a>
+      <a href="#approach" class="nav-link font-sans text-[12px] tracking-[0.06em]">Approach</a>
+      <a href="#process" class="nav-link font-sans text-[12px] tracking-[0.06em]">Process</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+        <svg class="icon-sun" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+        <svg class="icon-moon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a href="mailto:bdl@infolog.io" class="btn-p font-sans text-[12px] font-medium px-4 py-1.5 rounded-full no-underline hidden sm:inline-block">Get in Touch</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="min-h-screen flex flex-col items-center justify-center text-center px-6 pt-24 pb-20 relative">
+  <!-- Dithered ambient blobs -->
+  <div class="dither-blob parallax-slow" style="width: 700px; height: 700px; top: -10%; left: 50%; transform: translateX(-50%); background: radial-gradient(circle, var(--dither-1) 0%, transparent 65%); opacity: 0.8;"></div>
+  <div class="dither-blob" style="width: 400px; height: 400px; top: 15%; left: 12%; background: radial-gradient(circle, var(--dither-2) 0%, transparent 60%); opacity: 0.7;"></div>
+  <div class="dither-blob" style="width: 300px; height: 300px; bottom: 20%; right: 10%; background: radial-gradient(circle, var(--dither-3) 0%, transparent 55%); opacity: 0.6;"></div>
+
+  <p class="ha ha1 font-sans text-[12px] font-semibold tracking-[0.14em] uppercase" style="color: var(--accent);">AI Product Design Studio</p>
+
+  <h1 class="ha ha2 font-display font-normal mt-5 relative" style="font-size: clamp(4rem, 9vw, 8rem); line-height: 0.92; letter-spacing: -0.04em;">
+    We design the<br>products that make<br>AI <em class="grad italic">useful.</em>
+  </h1>
+
+  <p class="ha ha3 font-garamond mt-8 max-w-[520px]" style="font-size: clamp(1.2rem, 2vw, 1.5rem); line-height: 1.5; color: var(--text-2);">
+    Enterprise AI is full of impressive demos and broken workflows. We design the interfaces, systems, and experiences that close the gap.
+  </p>
+
+  <div class="ha ha3 ornament w-[200px] mt-11 mb-2">
+    <div class="ornament-dot"></div>
+  </div>
+
+  <div class="ha ha4 flex gap-4 mt-8">
+    <a href="mailto:bdl@infolog.io" class="btn-p font-sans text-[14px] font-medium px-9 py-4 rounded-full no-underline">Start a Conversation</a>
+    <a href="#work" class="btn-g font-sans text-[14px] px-9 py-4 rounded-full no-underline">See How</a>
+  </div>
+</section>
+
+<!-- WHAT WE DO — editorial statement -->
+<section id="work" class="max-w-[960px] mx-auto px-6 py-36 text-center rv relative">
+  <!-- Dithered blob behind text -->
+  <div class="dither-blob" style="width: 500px; height: 500px; top: 50%; left: 50%; transform: translate(-50%, -50%); background: radial-gradient(circle, var(--dither-2) 0%, transparent 60%); opacity: 0.5;"></div>
+
+  <p class="font-sans text-[12px] font-semibold tracking-[0.15em] uppercase mb-6" style="color: var(--accent-green);">The Problem</p>
+  <h2 class="font-display relative" style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.1; letter-spacing: -0.02em;">
+    Your model is smart.<br>
+    Your product isn't.<br>
+    <span style="color: var(--text-3);">We fix that.</span>
+  </h2>
+</section>
+
+<!-- SERVICES BENTO -->
+<section id="approach" class="max-w-[1040px] mx-auto px-6 mb-44 relative">
+  <!-- Dithered blob -->
+  <div class="dither-blob" style="width: 600px; height: 600px; top: -5%; right: -10%; background: radial-gradient(circle, var(--dither-1) 0%, transparent 55%); opacity: 0.4;"></div>
+
+  <div class="bento grid grid-cols-4 gap-3" style="grid-auto-rows: minmax(260px, auto);">
+
+    <div class="card col-span-2 p-9 md:p-10 flex flex-col justify-between rv d1">
+      <div>
+        <span class="font-sans text-[11px] font-semibold tracking-[0.1em] uppercase" style="color: var(--text-3);">AI Product Design</span>
+        <h3 class="font-display mt-4" style="font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.14;">End-to-end design<br>for AI-native products.</h3>
+      </div>
+      <p class="font-garamond text-[16px] leading-relaxed mt-6" style="color: var(--text-2); max-width: 340px;">
+        From model capability to production interface. We handle uncertainty states, human override patterns, and the trust architecture most teams skip.
+      </p>
+    </div>
+
+    <div class="card flex flex-col items-center justify-center text-center rv d2">
+      <span class="font-sans m-accent" style="font-size: clamp(3rem, 5.5vw, 4.5rem); font-weight: 300; letter-spacing: -0.04em;" data-count="20">0</span>
+      <span class="font-sans text-[11px] mt-2" style="color: var(--text-3);">years designing<br>enterprise software</span>
+    </div>
+
+    <div class="card flex flex-col items-center justify-center text-center rv d3">
+      <span class="font-sans m-green" style="font-size: clamp(3rem, 5.5vw, 4.5rem); font-weight: 300; letter-spacing: -0.04em;" data-count="2">0</span>
+      <span class="font-sans text-[11px] mt-2" style="color: var(--text-3);">patents in collaborative<br>document systems</span>
+    </div>
+
+    <div class="card p-9 md:p-10 flex flex-col justify-between rv d1">
+      <div>
+        <span class="font-sans text-[11px] font-semibold tracking-[0.1em] uppercase" style="color: var(--text-3);">Design Systems</span>
+        <h3 class="font-display mt-4" style="font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.14;">Infrastructure<br>that scales.</h3>
+      </div>
+      <p class="font-garamond text-[15px] leading-relaxed mt-6" style="color: var(--text-2);">
+        Component libraries, token architecture, and governance for distributed teams.
+      </p>
+    </div>
+
+    <div class="card col-span-3 p-9 md:p-10 flex flex-col justify-between rv d2">
+      <div>
+        <span class="font-sans text-[11px] font-semibold tracking-[0.1em] uppercase" style="color: var(--text-3);">Domains</span>
+        <h3 class="font-display mt-4" style="font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.14;">Enterprise-grade. <span style="color: var(--text-3);">Always.</span></h3>
+      </div>
+      <div class="flex flex-wrap gap-2.5 mt-8">
+        <span class="tag font-sans text-[12px] px-4 py-1.5 rounded-full">Cloud Infrastructure</span>
+        <span class="tag font-sans text-[12px] px-4 py-1.5 rounded-full">Identity & Access</span>
+        <span class="tag font-sans text-[12px] px-4 py-1.5 rounded-full">AI Accessibility</span>
+        <span class="tag font-sans text-[12px] px-4 py-1.5 rounded-full">Compliance Automation</span>
+        <span class="tag font-sans text-[12px] px-4 py-1.5 rounded-full">Design Operations</span>
+        <span class="tag font-sans text-[12px] px-4 py-1.5 rounded-full">Human–AI Interaction</span>
+      </div>
+    </div>
+
+    <!-- Illustration card — ready for your drawing -->
+    <div class="card col-span-2 rv d1 p-9 md:p-10 flex flex-col justify-between">
+      <span class="font-sans text-[11px] font-semibold tracking-[0.1em] uppercase" style="color: var(--text-3);">UX Engineering</span>
+      <div class="sketch-area flex-1 mt-4 mb-4 rounded-xl font-garamond text-[14px]">
+        <!-- Replace with your hand-drawn illustration -->
+        your illustration here
+      </div>
+      <p class="font-garamond text-[16px] leading-relaxed" style="color: var(--text-2); max-width: 360px;">
+        We prototype in code. Figma concepts become working React components with real data and real edge cases.
+      </p>
+    </div>
+
+    <div class="card col-span-2 p-9 md:p-10 flex flex-col justify-between rv d2">
+      <div>
+        <span class="font-sans text-[11px] font-semibold tracking-[0.1em] uppercase" style="color: var(--text-3);">Human–AI Interaction</span>
+        <h3 class="font-display mt-4" style="font-size: clamp(1.6rem, 2.6vw, 2.1rem); line-height: 1.14;">AI that people<br><span style="color: var(--text-3);">actually trust.</span></h3>
+      </div>
+      <p class="font-garamond text-[16px] leading-relaxed mt-6" style="color: var(--text-2); max-width: 360px;">
+        Legible decisions. Auditable outputs. Meaningful override controls. Trust isn't a feature — it's an architecture.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- SOCIAL PROOF — marquee -->
+<section class="border-t border-b div-line py-14 mb-44 rv overflow-hidden">
+  <p class="font-sans text-[11px] font-semibold tracking-[0.15em] uppercase mb-8 text-center" style="color: var(--text-3);">Experience across</p>
+  <div class="relative overflow-hidden">
+    <div class="marquee-track">
+      <div class="flex items-center gap-20 px-10">
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Cloud Consoles</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Identity Platforms</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">AI Accessibility</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Compliance Tools</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Design Systems</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Enterprise AI</span>
+        <span style="color: var(--ornament);">&middot;</span>
+      </div>
+      <div class="flex items-center gap-20 px-10" aria-hidden="true">
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Cloud Consoles</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Identity Platforms</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">AI Accessibility</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Compliance Tools</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Design Systems</span>
+        <span style="color: var(--ornament);">&middot;</span>
+        <span class="font-sans text-[15px] font-medium tracking-[0.05em] uppercase whitespace-nowrap" style="color: var(--text-3);">Enterprise AI</span>
+        <span style="color: var(--ornament);">&middot;</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="max-w-[780px] mx-auto px-6 py-20 text-center rv relative">
+  <span class="quote-mark" style="top: -16px; left: -6px;">&ldquo;</span>
+  <blockquote class="font-display italic relative z-10" style="font-size: clamp(1.6rem, 3vw, 2.3rem); line-height: 1.35;">
+    "The gap between a working model and a working product is 90% design decisions nobody wants to make."
+  </blockquote>
+  <div class="ornament w-[140px] mx-auto mt-7 mb-3">
+    <div class="ornament-dot"></div>
+  </div>
+  <cite class="font-sans text-[12px] font-normal tracking-[0.08em] uppercase block not-italic" style="color: var(--text-3);">Information Logistics</cite>
+</section>
+
+<!-- ABOUT — studio positioning, not personal bio -->
+<section class="px-6 mb-44">
+  <div class="glass-panel max-w-[1040px] mx-auto rv relative">
+    <!-- Dithered blob -->
+    <div class="dither-blob" style="width: 400px; height: 400px; top: -15%; right: -8%; background: radial-gradient(circle, var(--dither-3) 0%, transparent 55%); opacity: 0.5;"></div>
+
+    <div class="relative p-8 md:p-14">
+      <div class="flex justify-between items-start mb-12">
+        <span class="font-sans text-[11px] font-semibold tracking-[0.12em] uppercase" style="color: var(--accent);">About</span>
+        <a href="https://www.linkedin.com/in/brendanlee/" target="_blank" class="font-sans text-[11px] tracking-wide no-underline group" style="color: var(--text-3); border-bottom: 1px solid var(--card-border);">LinkedIn <span class="inline-block transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">&#8599;</span></a>
+      </div>
+
+      <h2 class="font-display mb-5" style="font-size: clamp(2.2rem, 4.5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.02em;">A studio built on<br>shipping real products.</h2>
+      <p class="font-garamond max-w-[600px] mb-10" style="font-size: clamp(1.1rem, 1.8vw, 1.35rem); line-height: 1.55; color: var(--text-2);">
+        Information Logistics is a product design practice for teams building AI into enterprise software. We've spent twenty years designing the systems humans use to operate complex machines — across cloud infrastructure, identity platforms, accessibility automation, and now applied AI.
+      </p>
+      <p class="font-garamond max-w-[600px] mb-12" style="font-size: clamp(1.1rem, 1.8vw, 1.35rem); line-height: 1.55; color: var(--text-2);">
+        We bring senior design leadership, hands-on UX engineering, and a deep understanding of the patterns that separate production AI from prototype AI. Two patents. Three platform-scale design systems. No handoffs to juniors.
+      </p>
+
+      <div class="terminal p-5 text-[13px] leading-[2] max-w-[540px]">
+        <span class="t-comment"># capabilities</span><br>
+        <span class="t-prompt">design</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-value">AI product UX · interaction design · prototyping</span><br>
+        <span class="t-prompt">systems</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="t-value">component libraries · tokens · governance</span><br>
+        <span class="t-prompt">engineering</span>&nbsp;<span class="t-value">React · Figma-to-code · design tooling</span><br>
+        <span class="t-prompt">research</span>&nbsp;&nbsp;&nbsp;<span class="t-flag">human-AI trust · error recovery · override UX</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section id="process" class="max-w-[780px] mx-auto px-6 mt-24 mb-44 rv relative">
+  <div class="dither-blob" style="width: 350px; height: 350px; top: -10%; left: -15%; background: radial-gradient(circle, var(--dither-2) 0%, transparent 55%); opacity: 0.4;"></div>
+
+  <h2 class="font-display text-center mb-14 relative" style="font-size: clamp(2.2rem, 4vw, 3.2rem); line-height: 1.08; letter-spacing: -0.02em;">How we work.</h2>
+
+  <div class="spec-row flex flex-col sm:flex-row sm:justify-between sm:items-baseline py-6 gap-2">
+    <span class="font-sans text-[12px] font-medium tracking-[0.06em] uppercase sm:w-[180px] shrink-0" style="color: var(--text-3);">Engagement</span>
+    <span class="font-garamond text-[17px]">Embedded or advisory — week to quarter</span>
+  </div>
+  <div class="spec-row flex flex-col sm:flex-row sm:justify-between sm:items-baseline py-6 gap-2">
+    <span class="font-sans text-[12px] font-medium tracking-[0.06em] uppercase sm:w-[180px] shrink-0" style="color: var(--text-3);">Methodology</span>
+    <span class="font-garamond text-[17px]">Shape Up · Jobs to Be Done · Spec-Driven</span>
+  </div>
+  <div class="spec-row flex flex-col sm:flex-row sm:justify-between sm:items-baseline py-6 gap-2">
+    <span class="font-sans text-[12px] font-medium tracking-[0.06em] uppercase sm:w-[180px] shrink-0" style="color: var(--text-3);">Deliverables</span>
+    <span class="font-garamond text-[17px]">Production UX · design systems · working prototypes</span>
+  </div>
+  <div class="spec-row flex flex-col sm:flex-row sm:justify-between sm:items-baseline py-6 gap-2">
+    <span class="font-sans text-[12px] font-medium tracking-[0.06em] uppercase sm:w-[180px] shrink-0" style="color: var(--text-3);">Stack</span>
+    <span class="font-garamond text-[17px]">Figma · React · Design tokens · Storybook</span>
+  </div>
+  <div class="spec-row flex flex-col sm:flex-row sm:justify-between sm:items-baseline py-6 gap-2">
+    <span class="font-sans text-[12px] font-medium tracking-[0.06em] uppercase sm:w-[180px] shrink-0" style="color: var(--text-3);">Leadership</span>
+    <span class="font-garamond text-[17px]">Principal-led. Senior-only. No delegation.</span>
+  </div>
+  <div class="spec-row flex flex-col sm:flex-row sm:justify-between sm:items-baseline py-6 gap-2">
+    <span class="font-sans text-[12px] font-medium tracking-[0.06em] uppercase sm:w-[180px] shrink-0" style="color: var(--text-3);">Location</span>
+    <span class="font-garamond text-[17px]">Remote — Pacific timezone</span>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="px-6 py-40 text-center relative">
+  <div class="dither-blob parallax-slow" style="width: 600px; height: 600px; bottom: 10%; left: 50%; transform: translateX(-50%); background: radial-gradient(circle, var(--dither-1) 0%, var(--dither-2) 40%, transparent 65%); opacity: 0.5;"></div>
+
+  <h2 class="font-display rv relative" style="font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.08; letter-spacing: -0.02em;">Your AI product<br>deserves better design.</h2>
+  <p class="font-garamond mt-6 max-w-[440px] mx-auto rv d1 relative" style="font-size: clamp(1.1rem, 1.7vw, 1.3rem); line-height: 1.55; color: var(--text-2);">
+    We take two to three engagements at a time. If you're building AI into enterprise software, let's talk.
+  </p>
+  <div class="flex gap-4 justify-center mt-12 rv d2 relative">
+    <a href="mailto:bdl@infolog.io" class="btn-p font-sans text-[14px] font-medium px-9 py-4 rounded-full no-underline">bdl@infolog.io</a>
+    <a href="https://www.linkedin.com/in/brendanlee/" target="_blank" class="btn-g font-sans text-[14px] px-9 py-4 rounded-full no-underline">LinkedIn</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="border-t div-line">
+  <div class="max-w-[1040px] mx-auto px-6 py-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+    <span class="font-sans text-[12px]" style="color: var(--text-3);">&copy; 2025 Information Logistics LLC</span>
+    <div class="flex gap-6">
+      <a href="https://www.linkedin.com/in/brendanlee/" target="_blank" class="font-sans text-[12px] no-underline nav-link" style="color: var(--text-3);">LinkedIn</a>
+      <a href="mailto:bdl@infolog.io" class="font-sans text-[12px] no-underline nav-link" style="color: var(--text-3);">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Theme toggle — light is now default
+  function toggleTheme() {
+    document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+  }
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') document.documentElement.classList.add('dark');
+
+  // Scroll reveal
+  const obs = new IntersectionObserver(e => e.forEach(x => {
+    if (x.isIntersecting) x.target.classList.add('vis');
+  }), { threshold: 0.08 });
+  document.querySelectorAll('.rv').forEach(el => obs.observe(el));
+
+  // Count-up animation
+  const countObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.count, 10);
+        let current = 0;
+        const step = Math.max(1, Math.floor(target / 25));
+        const interval = setInterval(() => {
+          current += step;
+          if (current >= target) { current = target; clearInterval(interval); }
+          el.textContent = current;
+        }, 45);
+        countObs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('[data-count]').forEach(el => countObs.observe(el));
+
+  // Parallax
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const y = window.scrollY;
+        document.querySelectorAll('.parallax-slow').forEach(el => {
+          el.style.transform = el.style.transform.replace(/translateY\([^)]*\)/, '') + ` translateY(${y * 0.06}px)`;
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+</script>
+</body>
+</html>
