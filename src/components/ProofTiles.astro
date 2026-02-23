@@ -1,0 +1,57 @@
+---
+import { caseStudies } from '../content/caseStudies';
+---
+
+<section id="proof" class="px-6 py-28 md:py-36">
+  <div class="max-w-[1200px] mx-auto">
+    <!-- Eyebrow -->
+    <p
+      class="font-mono text-[11px] uppercase tracking-[0.12em] mb-4"
+      style="color: var(--accent);"
+    >
+      Proof
+    </p>
+
+    <!-- Heading -->
+    <h2 class="font-sans text-2xl md:text-3xl font-semibold tracking-tight mb-12">
+      Where this work comes from.
+    </h2>
+
+    <!-- Tiles grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {caseStudies.map((study) => (
+        <div
+          class="rounded-2xl p-6 border"
+          style="background: var(--card); border-color: var(--card-border);"
+        >
+          <!-- Title -->
+          <h3 class="font-sans text-base font-semibold tracking-tight mb-2">
+            {study.title}
+          </h3>
+
+          <!-- Scope -->
+          <p class="text-[13px] leading-relaxed mb-4" style="color: var(--text-2);">
+            {study.scope}
+          </p>
+
+          <!-- Artifact tags -->
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            {study.artifacts.map((artifact) => (
+              <span
+                class="font-sans text-[11px] px-2 py-0.5 rounded-full"
+                style="background: var(--accent-soft); color: var(--accent);"
+              >
+                {artifact}
+              </span>
+            ))}
+          </div>
+
+          <!-- Outcome -->
+          <p class="text-[13px] font-medium" style="color: var(--text-1);">
+            {study.outcome}
+          </p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>

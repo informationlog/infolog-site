@@ -1,0 +1,82 @@
+---
+import { offers } from '../content/home';
+import { BOOKING_URL } from '../content/siteConfig';
+---
+
+<section id="services" class="px-6 py-28 md:py-36">
+  <div class="max-w-[1200px] mx-auto">
+    <!-- Eyebrow -->
+    <p
+      class="font-mono text-[11px] uppercase tracking-[0.12em] mb-4"
+      style="color: var(--accent);"
+    >
+      {offers.eyebrow}
+    </p>
+
+    <!-- Heading -->
+    <h2 class="font-sans text-2xl md:text-3xl font-semibold tracking-tight mb-12">
+      {offers.headline}
+    </h2>
+
+    <!-- Cards -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {offers.items.map((offer) => (
+        <div
+          class="rounded-2xl p-6 border flex flex-col"
+          style="background: var(--card); border-color: var(--card-border);"
+        >
+          <!-- Title -->
+          <h3 class="font-sans text-lg font-semibold tracking-tight mb-4">
+            {offer.title}
+          </h3>
+
+          <!-- Best for -->
+          <p class="text-[13px] mb-5" style="color: var(--text-2);">
+            <span class="font-medium" style="color: var(--text-3);">Best for:</span>{' '}
+            {offer.bestFor}
+          </p>
+
+          <!-- Deliverables -->
+          <div class="mb-5">
+            <p class="font-sans text-[11px] uppercase tracking-[0.08em] font-medium mb-2" style="color: var(--text-3);">
+              Deliverables
+            </p>
+            <ul class="flex flex-wrap gap-2">
+              {offer.deliverables.map((d) => (
+                <li
+                  class="font-sans text-[12px] px-2.5 py-1 rounded-full"
+                  style="background: var(--accent-soft); color: var(--accent);"
+                >
+                  {d}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <!-- Success -->
+          <p class="text-[14px] leading-relaxed mb-2" style="color: var(--text-1);">
+            {offer.success}
+          </p>
+
+          <!-- Timeline -->
+          <p class="text-[12px] mb-6" style="color: var(--text-3);">
+            {offer.timeline}
+          </p>
+
+          <!-- CTA -->
+          <div class="mt-auto">
+            <a
+              href={BOOKING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center font-sans text-[12px] uppercase tracking-[0.06em] font-medium px-5 py-2.5 rounded-full border transition-colors hover:opacity-70"
+              style="border-color: var(--accent); color: var(--accent);"
+            >
+              Book a call
+            </a>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
