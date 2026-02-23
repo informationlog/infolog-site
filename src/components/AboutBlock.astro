@@ -34,29 +34,15 @@ import { LINKEDIN_URL } from '../content/siteConfig';
       ))}
     </div>
 
-    <!-- Creative work -->
-    <p class="text-[14px] leading-relaxed mb-2" style="color: var(--text-2);">
-      {about.creative}
-    </p>
-    <div class="flex flex-wrap gap-4">
-      <a
-        href={about.instagram}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="font-sans text-[13px] font-medium transition-opacity hover:opacity-70"
-        style="color: var(--accent);"
-      >
-        Instagram ({about.instagramFollowers})
-      </a>
-      <a
-        href={LINKEDIN_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="font-sans text-[13px] font-medium transition-opacity hover:opacity-70"
-        style="color: var(--accent);"
-      >
-        LinkedIn
-      </a>
-    </div>
+    <!-- Links -->
+    <a
+      href={LINKEDIN_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="font-sans text-[13px] font-medium transition-opacity hover:opacity-70"
+      style="color: var(--accent);"
+    >
+      LinkedIn &rarr;
+    </a>
   </div>
 </section>

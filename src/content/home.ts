@@ -94,7 +94,7 @@ export const approach = {
 
 export const pov = {
   eyebrow: 'Point of View',
-  headline: 'Writing.',
+  headline: 'Design philosophy.',
   items: [
     {
       title: 'Designing AI Systems That Survive Audit',
@@ -121,9 +121,6 @@ export const about = {
     'Twenty years of enterprise platform work — from cloud console infrastructure (Oracle) to identity and access management (AWS IAM) to financial governance tooling (AWS Billing). I\'ve led both design and engineering organizations.',
     'I take a limited number of engagements at a time. Every project is principal-led.',
   ],
-  creative: 'Also: illustration and brand work for companies like Nike SB, Five Bor Skateboards, Google Cloud.',
-  instagram: 'https://www.instagram.com/brendandanlee/',
-  instagramFollowers: '~19k',
 };
 
 export const contact = {

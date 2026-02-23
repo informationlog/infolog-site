@@ -20,24 +20,23 @@ import { pov } from '../content/home';
     <!-- Article cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       {pov.items.map((item) => (
-        <a
-          href={`/pov/${item.slug}/`}
-          class="px-card group rounded-2xl p-6 border transition-colors"
+        <div
+          class="rounded-2xl p-6 border"
           style="background: var(--card); border-color: var(--card-border);"
         >
-          <h3 class="font-sans text-base font-semibold tracking-tight mb-2 group-hover:opacity-70 transition-opacity">
+          <h3 class="font-sans text-base font-semibold tracking-tight mb-2">
             {item.title}
           </h3>
           <p class="text-[13px] leading-relaxed mb-4" style="color: var(--text-2);">
             {item.description}
           </p>
           <span
-            class="font-sans text-[12px] font-medium"
-            style="color: var(--accent);"
+            class="font-sans text-[12px]"
+            style="color: var(--text-3);"
           >
-            Read &rarr;
+            Coming soon
           </span>
-        </a>
+        </div>
       ))}
     </div>
   </div>
