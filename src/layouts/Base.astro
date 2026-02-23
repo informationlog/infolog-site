@@ -1,0 +1,79 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Information Logistics — Enterprise AI Trust, Governance & Evaluation UX',
+  description = 'I design systems that make AI measurable, auditable, and safe to operate. Enterprise UX infrastructure, trust architecture, and evaluation tooling.',
+} = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+
+  <!-- OpenGraph -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content="https://www.infolog.io" />
+  <meta property="og:type" content="website" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <!-- Theme: apply saved preference before paint -->
+  <script is:inline>
+    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark');
+  </script>
+
+  <style is:global>
+    html { scroll-behavior: smooth; }
+    body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    :root {
+      --surface: #f5f3ef;
+      --card: #eae8e3;
+      --card-border: rgba(50,45,30,0.08);
+      --text-1: #1a1814;
+      --text-2: rgba(26,24,20,0.55);
+      --text-3: rgba(26,24,20,0.38);
+      --accent: #3d7a5f;
+      --accent-soft: rgba(61,122,95,0.08);
+    }
+
+    .dark {
+      --surface: #111110;
+      --card: #1a1918;
+      --card-border: rgba(255,240,210,0.07);
+      --text-1: #ede9e0;
+      --text-2: rgba(237,233,224,0.55);
+      --text-3: rgba(237,233,224,0.38);
+      --accent: #7bbf8a;
+      --accent-soft: rgba(123,191,138,0.08);
+    }
+
+    body {
+      background: var(--surface);
+      color: var(--text-1);
+      transition: background 0.4s, color 0.4s;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased overflow-x-hidden">
+  <slot />
+
+  <!-- Theme toggle script -->
+  <script is:inline>
+    window.toggleTheme = function() {
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+    };
+  </script>
+</body>
+</html>
