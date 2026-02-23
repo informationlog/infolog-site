@@ -1,0 +1,29 @@
+---
+import { contact } from '../content/home';
+import { BOOKING_URL } from '../content/siteConfig';
+---
+
+<section id="contact" class="px-6 py-28 md:py-36">
+  <div class="max-w-[640px] mx-auto text-center">
+    <!-- Heading -->
+    <h2 class="font-sans text-3xl md:text-4xl font-semibold tracking-tight mb-4">
+      {contact.headline}
+    </h2>
+
+    <!-- Subtext -->
+    <p class="text-[15px] leading-relaxed mb-10" style="color: var(--text-2);">
+      {contact.subtext}
+    </p>
+
+    <!-- CTA -->
+    <a
+      href={BOOKING_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center font-sans text-[14px] uppercase tracking-[0.06em] font-medium px-8 py-4 rounded-full transition-opacity hover:opacity-90"
+      style="background: var(--accent); color: var(--surface);"
+    >
+      Book a call
+    </a>
+  </div>
+</section>

@@ -1,0 +1,44 @@
+---
+import { pov } from '../content/home';
+---
+
+<section id="pov" class="px-6 py-28 md:py-36">
+  <div class="max-w-[1200px] mx-auto">
+    <!-- Eyebrow -->
+    <p
+      class="font-mono text-[11px] uppercase tracking-[0.12em] mb-4"
+      style="color: var(--accent);"
+    >
+      {pov.eyebrow}
+    </p>
+
+    <!-- Heading -->
+    <h2 class="font-sans text-2xl md:text-3xl font-semibold tracking-tight mb-12">
+      {pov.headline}
+    </h2>
+
+    <!-- Article cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {pov.items.map((item) => (
+        <a
+          href={`/pov/${item.slug}/`}
+          class="group rounded-2xl p-6 border transition-colors"
+          style="background: var(--card); border-color: var(--card-border);"
+        >
+          <h3 class="font-sans text-base font-semibold tracking-tight mb-2 group-hover:opacity-70 transition-opacity">
+            {item.title}
+          </h3>
+          <p class="text-[13px] leading-relaxed mb-4" style="color: var(--text-2);">
+            {item.description}
+          </p>
+          <span
+            class="font-sans text-[12px] font-medium"
+            style="color: var(--accent);"
+          >
+            Read &rarr;
+          </span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
