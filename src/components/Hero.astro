@@ -1,0 +1,64 @@
+---
+import { hero } from '../content/home';
+import { BOOKING_URL } from '../content/siteConfig';
+---
+
+<section class="min-h-screen flex items-center px-6">
+  <div class="max-w-[1200px] mx-auto w-full py-32">
+    <!-- Eyebrow -->
+    <p
+      class="font-mono text-[11px] uppercase tracking-[0.12em] mb-6"
+      style="color: var(--accent);"
+    >
+      {hero.eyebrow}
+    </p>
+
+    <!-- Headline -->
+    <h1
+      class="font-sans font-semibold leading-[1.05] tracking-[-0.03em] mb-6"
+      style="font-size: clamp(2.5rem, 5.5vw, 4.5rem);"
+    >
+      {hero.headline}
+    </h1>
+
+    <!-- Subhead -->
+    <p
+      class="text-[16px] leading-relaxed max-w-[640px] mb-10"
+      style="color: var(--text-2);"
+    >
+      {hero.subhead}
+    </p>
+
+    <!-- CTAs -->
+    <div class="flex flex-wrap gap-4 mb-16">
+      <a
+        href={BOOKING_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center font-sans text-[13px] uppercase tracking-[0.06em] font-medium px-6 py-3 rounded-full transition-opacity hover:opacity-90"
+        style="background: var(--accent); color: var(--surface);"
+      >
+        Book a call
+      </a>
+      <a
+        href="#proof"
+        class="inline-flex items-center font-sans text-[13px] uppercase tracking-[0.06em] font-medium px-6 py-3 rounded-full border transition-colors hover:opacity-70"
+        style="border-color: var(--card-border); color: var(--text-2);"
+      >
+        See proof
+      </a>
+    </div>
+
+    <!-- Credibility bar -->
+    <div class="flex flex-col gap-2">
+      {hero.credibility.map((line) => (
+        <p
+          class="font-sans text-[12px] tracking-wide"
+          style="color: var(--text-3);"
+        >
+          {line}
+        </p>
+      ))}
+    </div>
+  </div>
+</section>
