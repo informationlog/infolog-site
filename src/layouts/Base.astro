@@ -79,6 +79,15 @@ const {
       outline-offset: 2px;
       border-radius: 4px;
     }
+
+    .px-card {
+      will-change: transform;
+      box-shadow: 0 24px 80px -16px rgba(0,0,0,0.08);
+      transition: box-shadow 0.4s ease;
+    }
+    .dark .px-card {
+      box-shadow: 0 24px 80px -16px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body class="font-sans antialiased overflow-x-hidden">
@@ -99,6 +108,27 @@ const {
       { threshold: 0.1 }
     );
     document.querySelectorAll('.rv').forEach((el) => observer.observe(el));
+  </script>
+
+  <!-- Parallax cards -->
+  <script is:inline>
+    (function() {
+      const cards = document.querySelectorAll('.px-card');
+      if (!cards.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      function onScroll() {
+        const vh = window.innerHeight;
+        cards.forEach(function(card) {
+          var rect = card.getBoundingClientRect();
+          var center = rect.top + rect.height / 2;
+          var offset = (center - vh / 2) / vh;
+          card.style.transform = 'translateY(' + (offset * 28) + 'px)';
+        });
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    })();
   </script>
 </body>
 </html>
